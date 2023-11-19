@@ -16,8 +16,6 @@ public:
 	bool IsFull() const;
 	void Enqueue(Order order);
 	void Dequeue(Order& order);
-	int GetMaxItems() const;
-	Heap GetHeap() const;
 	
 	~PQ();
 	PQ(const PQ&);

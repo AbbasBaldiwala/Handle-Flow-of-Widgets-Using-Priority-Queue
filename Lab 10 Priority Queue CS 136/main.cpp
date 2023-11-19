@@ -132,7 +132,12 @@ void EnterPlaceOrderSubmenu(int& quantityOnHand, PQ& pQ, int& trackingNum, int d
         int trackingNumber = (BASE_TRACKING_NUMBER * day) + (++trackingNum);
         order.SetOrder(rushStatus, trackingNumber, numOrdered);
 
-        pQ.Enqueue(order);
+        try {
+            pQ.Enqueue(order);
+        }
+        catch (FullPQ&) {
+            cerr << "Queue is full, cannot process order\n\n";
+        }
     }
     else {
         cout << "The warehouse cannot process any more orders for the day.\n";
@@ -175,14 +180,30 @@ int GetRushStatus() {
 }
 
 void CloseWarehouse(PQ& pQ, int& day, int& trackingNumber, int& quantityOnHand, string header, string border) {
+    /*PQ copy;      //uncomment to test rule of 3
+    copy = pQ;*/
     double totalCostToMake = 0, totalProfit = 0, totalCostCustomer = 0;
     int totalOrders = 0;
     cout << header << border;
     while (!pQ.IsEmpty()) {
         Order order;
-        pQ.Dequeue(order);
+        try {
+            pQ.Dequeue(order);
+        }
+        catch (EmptyPQ&) {
+            cerr << "Unable to process order from an empty queue\n\n";
+        }
         CalculateCosts(order, totalCostToMake, totalProfit, totalCostCustomer, totalOrders);
     }
+    /*cout << border << "\n\n";
+    cout << "copy assignment operator test\n\n";
+    cout << header << border;
+    while (!copy.IsEmpty()) {
+        Order order;
+        copy.Dequeue(order);
+        CalculateCosts(order, totalCostToMake, totalProfit, totalCostCustomer, totalOrders);
+    }
+    cout << border << "\n\n";*/
     cout << border << "Day " << day << " Totals: \n"
         "Orders Processed: " << totalOrders << "\n" <<
         "Cost To Warehouse: " << totalCostToMake << "\n" <<
@@ -217,6 +238,5 @@ void PrintOrder(Order order, double costToCustomer, double costToWarehouse) {
         costToCustomer << setw(SETW_COST_TO_CUSTOMER) <<
         costToWarehouse << setw(SETW_COST_TO_WAREHOUSE) <<
         (order.amountOrdered * WIDGET_PRICE) * (order.percentMarkup / 100) << "\n";
-
 }
 

@@ -56,19 +56,13 @@ void PQ::Dequeue(Order& item) {
 	}
 }
 
-int PQ::GetMaxItems() const {
-	return maxItems;
-}
-
-Heap PQ::GetHeap() const {
-	return ordersHeap;
-}
 
 void PQ::copyPQ(const PQ& other) {
-	int size = other.GetMaxItems();
+	int size = other.maxItems;
 	SetPQ(size);
+	length = other.length;
 	for (int i = 0; i < size; i++) {
-		ordersHeap.orders[i] = other.GetHeap().orders[i];
+		ordersHeap.orders[i] = other.ordersHeap.orders[i];
 	}
 }
 

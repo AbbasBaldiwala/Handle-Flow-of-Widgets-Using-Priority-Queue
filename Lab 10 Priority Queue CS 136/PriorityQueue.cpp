@@ -7,7 +7,7 @@ PQ::PQ(int size) {
 
 
 PQ::PQ() {
-	SetPQ(10); //change
+	SetPQ(DEFAULT_QUEUE_SIZE); //change
 }
 
 void PQ::SetPQ(int size) {

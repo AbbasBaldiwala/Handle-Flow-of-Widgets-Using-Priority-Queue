@@ -5,23 +5,29 @@
 
 using namespace std;
 
-const int 
+const int
 MAX_NUM_WIDGETS_PER_DAY = 100,
 DISPLAY_PRECISION = 2,
 MAX_QUEUE_SIZE = 10,
-BASE_TRACKING_NUMBER = 100, 
+BASE_TRACKING_NUMBER = 100,
 SETW_AMOUNT = 10,
-SETW_TRACKING_NUM = 15, 
-SETW_RUSH_STATUS = 18, 
-SETW_AMOUNT_ORDERED = 15, 
+SETW_TRACKING_NUM = 15,
+SETW_RUSH_STATUS = 18,
+SETW_AMOUNT_ORDERED = 15,
 SETW_MARKUP_P = 15,
-SETW_COST_TO_CUSTOMER = 15, 
+SETW_COST_TO_CUSTOMER = 15,
 SETW_COST_TO_WAREHOUSE = 15,
-TABLE_SIZE = SETW_AMOUNT+SETW_TRACKING_NUM+SETW_RUSH_STATUS+SETW_AMOUNT_ORDERED+SETW_MARKUP_P+SETW_COST_TO_CUSTOMER+SETW_COST_TO_WAREHOUSE + 1;
+TABLE_SIZE = SETW_AMOUNT + SETW_TRACKING_NUM + SETW_RUSH_STATUS + SETW_AMOUNT_ORDERED + SETW_MARKUP_P + SETW_COST_TO_CUSTOMER + SETW_COST_TO_WAREHOUSE + 1,
+SETW_SUMMARY = 25,
+SETW_NUM_ORDERS = 16,
+SETW_COST_TO_MAKE = 16,
+SETW_NET_PROFIT = 14,
+SETW_GROSS_PROFIT = 16,
+SET_INVENTORY_LEFT = 18,
+SUMMARY_TABLE_SIZE = SETW_NUM_ORDERS+SETW_COST_TO_MAKE+SETW_NET_PROFIT+SETW_GROSS_PROFIT+SET_INVENTORY_LEFT;
 
-const double 
-WIDGET_PRICE = 5.00, 
-WIDGET_COST_TO_MAKE = 1.50;
+const double
+WIDGET_PRICE = 5.00;
 
 enum Menu{DISPLAY_INVENTORY_ON_HAND = 1, PLACE_ORDER, CLOSE_FOR_THE_DAY, QUIT};
 
@@ -59,6 +65,8 @@ void CalculateCosts(Order order, double& totalCostWarehouse, double& totalProfit
 /*pre:
 post:*/
 void PrintOrder(Order order, double costToCustomer, double costToWarehouse);
+
+void PrintSummary(int totalOrders, double totalCostToMake, double totalProfit, double totalCostToCutomer, int quantityOnHand, string summaryBorder);
 
 int main() {
     int userChoice,
@@ -113,8 +121,8 @@ void ClearInvalidInput(string errMsg) {
 
 void DisplayInventoryOnHand(const int& quantityOnHand) {
     cout << "The warehouse currently has " << MAX_NUM_WIDGETS_PER_DAY - quantityOnHand << 
-        " widgets in the queue\nThe warehouse can process " 
-        << quantityOnHand << " more widgets today\n";
+        " widgets in the queue\n" 
+        << quantityOnHand << " more widgets can be proccessed today\n";
 }
 
 
@@ -180,35 +188,29 @@ int GetRushStatus() {
 }
 
 void CloseWarehouse(PQ& pQ, int& day, int& trackingNumber, int& quantityOnHand, string header, string border) {
-    /*PQ copy;      //uncomment to test rule of 3
-    copy = pQ;*/
     double totalCostToMake = 0, totalProfit = 0, totalCostCustomer = 0;
     int totalOrders = 0;
-    cout << header << border;
-    while (!pQ.IsEmpty()) {
-        Order order;
-        try {
-            pQ.Dequeue(order);
+    stringstream summaryBorder("");
+    summaryBorder << setfill('-') << setw(SUMMARY_TABLE_SIZE) << "\n";
+    string sBorder = summaryBorder.str();
+    if (!pQ.IsEmpty()) {
+        cout << "\n" << header << border;
+        while (!pQ.IsEmpty()) {
+            Order order;
+            try {
+                pQ.Dequeue(order);
+            }
+            catch (EmptyPQ&) {
+                cerr << "Unable to process order from an empty queue\n\n";
+            }
+            CalculateCosts(order, totalCostToMake, totalProfit, totalCostCustomer, totalOrders);
         }
-        catch (EmptyPQ&) {
-            cerr << "Unable to process order from an empty queue\n\n";
-        }
-        CalculateCosts(order, totalCostToMake, totalProfit, totalCostCustomer, totalOrders);
+        cout << border;
+        cout << right << "\n\nDAY " << day << " SUMMARY: \n\n";
+        PrintSummary(totalOrders, totalCostToMake, totalProfit, totalCostCustomer, quantityOnHand, sBorder);
     }
-    /*cout << border << "\n\n";
-    cout << "copy assignment operator test\n\n";
-    cout << header << border;
-    while (!copy.IsEmpty()) {
-        Order order;
-        copy.Dequeue(order);
-        CalculateCosts(order, totalCostToMake, totalProfit, totalCostCustomer, totalOrders);
-    }
-    cout << border << "\n\n";*/
-    cout << border << "Day " << day << " Totals: \n"
-        "Orders Processed: " << totalOrders << "\n" <<
-        "Cost To Warehouse: " << totalCostToMake << "\n" <<
-        "Net Profit: " << totalProfit << "\n" <<
-        "Total Cost To Customers: " << totalCostCustomer << "\n";
+    else
+        cout << "No orders processed today\n";
     day++;
     trackingNumber = 0;
     quantityOnHand = MAX_NUM_WIDGETS_PER_DAY;
@@ -216,7 +218,7 @@ void CloseWarehouse(PQ& pQ, int& day, int& trackingNumber, int& quantityOnHand, 
 
 void CalculateCosts(Order order, double& totalCostWarehouse, double& totalProfit, double& totalCostCustomer, int& totalAmountOrdered) {
     totalAmountOrdered += order.amountOrdered;
-    double orderCostToMake = order.amountOrdered * WIDGET_COST_TO_MAKE;
+    double orderCostToMake = order.amountOrdered * WIDGET_PRICE;
     double grossProfit = order.amountOrdered * WIDGET_PRICE * (1 + (order.percentMarkup / 100));
     double netProfit = grossProfit - orderCostToMake;
     PrintOrder(order, grossProfit, orderCostToMake);
@@ -240,3 +242,18 @@ void PrintOrder(Order order, double costToCustomer, double costToWarehouse) {
         (order.amountOrdered * WIDGET_PRICE) * (order.percentMarkup / 100) << "\n";
 }
 
+
+void PrintSummary(int totalOrders, double totalCostToMake, double totalProfit, double totalCostCustomer, int quantityOnHand, string summaryBorder) {
+    cout << setw(SETW_NUM_ORDERS) << "Number of orders" << 
+        setw(SETW_COST_TO_MAKE) << "Cost to Make" << 
+        setw(SETW_NET_PROFIT) << "Net Profit" << 
+        setw(SETW_GROSS_PROFIT) << "Gross Profit" << 
+        setw(SET_INVENTORY_LEFT) << "Inventory left\n" << 
+        summaryBorder << right << 
+        setw(SETW_NUM_ORDERS) << totalOrders << 
+        setw(SETW_COST_TO_MAKE) << totalCostToMake << 
+        setw(SETW_NET_PROFIT) << totalProfit << 
+        setw(SETW_GROSS_PROFIT) << totalCostCustomer << 
+        setw(SET_INVENTORY_LEFT - 1) << quantityOnHand << 
+        "\n" << summaryBorder;
+}

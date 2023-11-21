@@ -3,6 +3,8 @@
 
 #include "Heap.h"
 
+const int DEFAULT_QUEUE_SIZE = 25;
+
 class FullPQ {};
 class EmptyPQ {};
 

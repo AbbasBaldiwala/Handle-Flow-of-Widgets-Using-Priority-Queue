@@ -1,6 +1,8 @@
 #include "Heap.h"
 
 void Heap::ReheapDown(int root, int bottom) {
+	//Pre: none
+	//Post: Heap Property is restored
 	int maxChild; int rightChild; int leftChild;
 	leftChild = root * 2 + 1;
 	rightChild = root * 2 + 2;
@@ -25,6 +27,7 @@ void Heap::ReheapDown(int root, int bottom) {
 }
 
 void Heap::ReheapUp(int root, int bottom) {
+	//Pre: none
 	// Post: Heap property is restored.
 	int parent;
 	if (bottom > root) {
@@ -38,6 +41,8 @@ void Heap::ReheapUp(int root, int bottom) {
 }
 
 void Heap::Swap(Order& upper, Order& lower) {
+	//Pre: none
+	//Post: child node is swapped with parent node
 	Order temp = lower;
 	lower = upper;
 	upper = temp;

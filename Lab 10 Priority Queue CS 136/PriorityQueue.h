@@ -12,12 +12,12 @@ class PQ {
 public:
 	PQ(int);
 	PQ();
-	void SetPQ(int);
-	void MakeEmpty();
-	bool IsEmpty() const;
-	bool IsFull() const;
-	void Enqueue(Order order);
-	void Dequeue(Order& order);
+	void SetPQ(int); //created the queue of the correct size
+	void MakeEmpty(); // deletes the queue
+	bool IsEmpty() const; //returns true if the queue is empty
+	bool IsFull() const; //returns true if the queue is full
+	void Enqueue(Order order); // adds an order to the queue
+	void Dequeue(Order& order); // removes an order from the queue and copies it into the parameter
 	
 	~PQ();
 	PQ(const PQ&);
@@ -27,7 +27,7 @@ private:
 	Heap ordersHeap;
 	int maxItems;
 
-	void copyPQ(const PQ& other);
+	void copyPQ(const PQ& other); //copys the queue
 };
 
 

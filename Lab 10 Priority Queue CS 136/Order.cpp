@@ -1,6 +1,8 @@
 #include "Order.h"
 
 void Order::SetOrder(int rushStat, int trackingNum, int amount) {
+	//Pre: none
+	//Post: all the correct values are placed in the order
 	rushStatus = rushStat;
 	trackingNumber = trackingNum;
 	amountOrdered = amount;
@@ -22,9 +24,13 @@ void Order::SetOrder(int rushStat, int trackingNum, int amount) {
 }
 
 Order::Order() {
+	//Pre: none
+	//Post: an order is created
 	SetOrder(-1, -1, -1);
 }
 
 Order::Order(int rushStat, int trackingNum, int amount) {
+	//Pre: none
+	//Post: an order is created
 	SetOrder(rushStat, trackingNum, amount);
 }

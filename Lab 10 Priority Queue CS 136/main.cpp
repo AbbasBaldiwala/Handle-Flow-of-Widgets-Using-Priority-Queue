@@ -200,7 +200,8 @@ int GetRushStatus() {
     return rushStatus;
 }
 
-void CloseWarehouse(PQ& pQ, int& day, int& trackingNumber, int& quantityOnHand, string header, string border, int& spaceInQueue) {
+void CloseWarehouse(PQ& pQQ, int& day, int& trackingNumber, int& quantityOnHand, string header, string border, int& spaceInQueue) {
+    PQ pQ = pQQ;
     double totalCostToMake = 0, totalProfit = 0, totalCostCustomer = 0;
     int totalOrders = 0;
     stringstream summaryBorder("");
